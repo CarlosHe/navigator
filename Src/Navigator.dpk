@@ -33,6 +33,6 @@ requires
   fmx;
 
 contains
-  FMX.Navigator in 'Src\FMX.Navigator.pas';
+  FMX.Navigator in 'FMX.Navigator.pas';
 
 end.
