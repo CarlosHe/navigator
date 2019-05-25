@@ -1,0 +1,28 @@
+object SimpleMaster: TSimpleMaster
+  Size.Width = 357.000000000000000000
+  Size.Height = 458.000000000000000000
+  Size.PlatformDefault = False
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Lines.Strings = (
+      'Master')
+    Position.X = 72.000000000000000000
+    Position.Y = 135.000000000000000000
+    Size.Width = 209.000000000000000000
+    Size.Height = 161.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Viewport.Width = 205.000000000000000000
+    Viewport.Height = 157.000000000000000000
+  end
+  object Button1: TButton
+    Align = Top
+    Size.Width = 357.000000000000000000
+    Size.Height = 73.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Detail'
+    OnClick = Button1Click
+  end
+end

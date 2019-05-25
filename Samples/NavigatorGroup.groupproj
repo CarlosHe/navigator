@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E63B7BCE-F653-4821-95C3-D768291657A9}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\Navigator.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Simple\Simple.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Navigator">
+        <MSBuild Projects="..\Navigator.dproj"/>
+    </Target>
+    <Target Name="Navigator:Clean">
+        <MSBuild Projects="..\Navigator.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Navigator:Make">
+        <MSBuild Projects="..\Navigator.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Simple">
+        <MSBuild Projects="Simple\Simple.dproj"/>
+    </Target>
+    <Target Name="Simple:Clean">
+        <MSBuild Projects="Simple\Simple.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Simple:Make">
+        <MSBuild Projects="Simple\Simple.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Navigator;Simple"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Navigator:Clean;Simple:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Navigator:Make;Simple:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

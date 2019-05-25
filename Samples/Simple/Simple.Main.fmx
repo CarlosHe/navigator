@@ -1,0 +1,39 @@
+object SimpleMain: TSimpleMain
+  Left = 0
+  Top = 0
+  Caption = 'Form10'
+  ClientHeight = 480
+  ClientWidth = 350
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 3
+  object Navigator: TNavigator
+    Align = Top
+    Size.Width = 350.000000000000000000
+    Size.Height = 56.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    MultiView = MultiView
+    Fill.Color = claCornflowerblue
+    Title = 'Navigator'
+    FontColor = claWhite
+  end
+  object MultiView: TMultiView
+    Mode = Drawer
+    Size.Width = 250.000000000000000000
+    Size.Height = 424.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 2
+    object Button1: TButton
+      Align = Top
+      Size.Width = 250.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Master'
+      OnClick = Button1Click
+    end
+  end
+end

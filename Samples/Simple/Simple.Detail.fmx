@@ -1,0 +1,19 @@
+object SimpleDetail: TSimpleDetail
+  Size.Width = 368.000000000000000000
+  Size.Height = 471.000000000000000000
+  Size.PlatformDefault = False
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Lines.Strings = (
+      'Detail')
+    Position.X = 72.000000000000000000
+    Position.Y = 144.000000000000000000
+    Size.Width = 209.000000000000000000
+    Size.Height = 161.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Viewport.Width = 209.000000000000000000
+    Viewport.Height = 161.000000000000000000
+  end
+end
