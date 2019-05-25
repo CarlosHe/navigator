@@ -3,7 +3,7 @@
         <ProjectGuid>{E63B7BCE-F653-4821-95C3-D768291657A9}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="..\Navigator.dproj">
+        <Projects Include="..\Src\Navigator.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="Simple\Simple.dproj">
@@ -18,13 +18,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="Navigator">
-        <MSBuild Projects="..\Navigator.dproj"/>
+        <MSBuild Projects="..\Src\Navigator.dproj"/>
     </Target>
     <Target Name="Navigator:Clean">
-        <MSBuild Projects="..\Navigator.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Src\Navigator.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Navigator:Make">
-        <MSBuild Projects="..\Navigator.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Src\Navigator.dproj" Targets="Make"/>
     </Target>
     <Target Name="Simple">
         <MSBuild Projects="Simple\Simple.dproj"/>

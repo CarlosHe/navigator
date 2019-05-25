@@ -15,8 +15,6 @@ type
     Button1: TButton;
     Navigator: TNavigator;
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -34,18 +32,6 @@ procedure TSimpleMain.Button1Click(Sender: TObject);
 begin
   Navigator.Push(TSimpleMaster.Create(Navigator));
   MultiView.HideMaster;
-end;
-
-procedure TSimpleMain.Button2Click(Sender: TObject);
-begin
-  Navigator.FontColor := TAlphaColorRec.Red;
-  Label1.TextSettings.FontColor := TAlphaColorRec.Red;
-end;
-
-procedure TSimpleMain.Button3Click(Sender: TObject);
-begin
-  Navigator.FontColor := TAlphaColorRec.White;
-  Label1.TextSettings.FontColor := TAlphaColorRec.White;
 end;
 
 end.
