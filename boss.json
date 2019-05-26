@@ -3,7 +3,9 @@
 	"description": "",
 	"version": "1.0.0",
 	"homepage": "",
-	"mainsrc": "./Src",
-	"projects": [],
+	"mainsrc": "Src/",
+	"projects": [
+		"Navigator.dproj"
+	],
 	"dependencies": {}
 }
