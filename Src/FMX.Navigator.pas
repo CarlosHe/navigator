@@ -17,8 +17,8 @@ type
     FFontColor: TAlphaColor;
 
     FShadowEffectToolbar: TShadowEffect;
-    FToolBar: TToolBar;
-    FLabelCaption: TLabel;
+    FRectangle: TRectangle;
+    FTitle: TLabel;
     FMenuButton: TSpeedButton;
     FBackButton: TSpeedButton;
 
@@ -29,20 +29,17 @@ type
     procedure SetTitle(const Value: string);
     procedure SetFontColor(const Value: TAlphaColor);
     procedure DoPush(TitleNavigator: string; Frame: TFrame);
-    function GetTintColor: TAlphaColor;
-    procedure SetTintColor(const Value: TAlphaColor);
     procedure BackButtonClick(Sender: TObject);
     procedure MenuButtonClick(Sender: TObject);
 
     procedure CreateShadow;
     procedure CreateButtons;
-    procedure CreateToolbar;
+    procedure CreateRectangle;
     procedure CreateLabel;
     procedure SetHeight(const Value: Single);
+    function GetFill: TBrush;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function DoSetSize(const ASize: TControlSize; const NewPlatformDefault: Boolean; ANewWidth: Single;
-      ANewHeight: Single; var ALastWidth: Single; var ALastHeight: Single): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -54,7 +51,7 @@ type
 
   published
     property MultiView: TMultiView read FMultiView write SetMultiView;
-    property TintColor: TAlphaColor read GetTintColor write SetTintColor;
+    property Fill: TBrush read GetFill;
     property Title: string read GetTitle write SetTitle;
     property FontColor: TAlphaColor read FFontColor write SetFontColor default TAlphaColorRec.Black;
   end;
@@ -87,9 +84,9 @@ end;
 constructor TNavigator.Create(AOwner: TComponent);
 begin
   inherited;
-  FStack := TStack < TPair < string, TFrame >>.Create;
+  FStack := TStack<TPair<string, TFrame>>.Create;
   CreateShadow;
-  CreateToolbar;
+  CreateRectangle;
   CreateButtons;
   CreateLabel;
 
@@ -102,18 +99,18 @@ end;
 procedure TNavigator.CreateButtons;
 begin
   FMenuButton := TSpeedButton.Create(Self);
-  FMenuButton.Parent := FToolBar;
+  FMenuButton.Parent := FRectangle;
   FMenuButton.Align := TAlignLayout.Left;
-  FMenuButton.Size.Width := FToolBar.Height;
+  FMenuButton.Size.Width := FRectangle.Height;
   FMenuButton.StyleLookup := 'drawertoolbutton';
   FMenuButton.OnClick := MenuButtonClick;
   FMenuButton.Stored := False;
   FMenuButton.SetSubComponent(True);
 
   FBackButton := TSpeedButton.Create(Self);
-  FBackButton.Parent := FToolBar;
+  FBackButton.Parent := FRectangle;
   FBackButton.Align := TAlignLayout.Left;
-  FBackButton.Size.Width := FToolBar.Height;
+  FBackButton.Size.Width := FRectangle.Height;
   FBackButton.StyleLookup := 'backtoolbutton';
   FBackButton.Visible := False;
   FBackButton.OnClick := BackButtonClick;
@@ -127,13 +124,13 @@ end;
 
 procedure TNavigator.CreateLabel;
 begin
-  FLabelCaption := TLabel.Create(Self);
-  FLabelCaption.Parent := FToolBar;
-  FLabelCaption.Align := TAlignLayout.Client;
-  FLabelCaption.Margins.Left := 16;
-  FLabelCaption.Margins.Top := 5;
-  FLabelCaption.Margins.Right := 5;
-  FLabelCaption.Margins.Bottom := 5;
+  FTitle := TLabel.Create(Self);
+  FTitle.Parent := FRectangle;
+  FTitle.Align := TAlignLayout.Client;
+  FTitle.Margins.Left := 16;
+  FTitle.Margins.Top := 5;
+  FTitle.Margins.Right := 5;
+  FTitle.Margins.Bottom := 5;
 end;
 
 procedure TNavigator.CreateShadow;
@@ -149,14 +146,14 @@ begin
   FShadowEffectToolbar.SetSubComponent(True);
 end;
 
-procedure TNavigator.CreateToolbar;
+procedure TNavigator.CreateRectangle;
 begin
-  FToolBar := TToolBar.Create(Self);
-  FToolBar.Align := TAlignLayout.Contents;
-  FToolBar.StyleLookup := 'ToolBarStyle';
-  FToolBar.Parent := Self;
-  FToolBar.SetSubComponent(True);
-  FToolBar.Stored := False;
+  FRectangle := TRectangle.Create(Self);
+  FRectangle.SetSubComponent(True);
+  FRectangle.Stored := False;
+  FRectangle.Stroke.Kind := TBrushKind.None;
+  FRectangle.Align := TAlignLayout.Client;
+  FRectangle.Parent := Self;
 end;
 
 destructor TNavigator.Destroy;
@@ -169,14 +166,14 @@ begin
   inherited;
 end;
 
-function TNavigator.GetTintColor: TAlphaColor;
+function TNavigator.GetFill: TBrush;
 begin
-  Result := FToolBar.TintColor;
+  Result := FRectangle.Fill;
 end;
 
 function TNavigator.GetTitle: string;
 begin
-  Result := FLabelCaption.Text;
+  Result := FTitle.Text;
 end;
 
 function TNavigator.HasMultiView: Boolean;
@@ -239,16 +236,6 @@ begin
   Frame.Parent := Parent;
 end;
 
-function TNavigator.DoSetSize(const ASize: TControlSize; const NewPlatformDefault: Boolean; ANewWidth,
-  ANewHeight: Single; var ALastWidth, ALastHeight: Single): Boolean;
-begin
-  inherited;
-  FToolBar.Height := ANewHeight;
-  FToolBar.Width := ANewHeight;
-  FMenuButton.Size.Width := FToolBar.Height;
-  FBackButton.Size.Width := FToolBar.Height;
-end;
-
 procedure TNavigator.Push(NavigatorTitle: string; Frame: TFrame);
 begin
   DoPush(NavigatorTitle, Frame);
@@ -264,7 +251,7 @@ begin
   if FFontColor <> Value then
   begin
     FFontColor := Value;
-    FLabelCaption.TextSettings.FontColor := Value;
+    FTitle.TextSettings.FontColor := Value;
     FBackButton.IconTintColor := Value;
     FMenuButton.IconTintColor := Value;
   end;
@@ -290,15 +277,10 @@ begin
   end;
 end;
 
-procedure TNavigator.SetTintColor(const Value: TAlphaColor);
-begin
-  FToolBar.TintColor := Value;
-end;
-
 procedure TNavigator.SetTitle(const Value: string);
 begin
-  if FLabelCaption.Text <> Value then
-    FLabelCaption.Text := Value;
+  if FTitle.Text <> Value then
+    FTitle.Text := Value;
 end;
 
 end.
