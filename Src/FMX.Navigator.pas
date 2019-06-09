@@ -43,10 +43,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property Stack: TStack < TPair < string, TFrame >> read FStack write FStack;
+    property Stack: TStack <TPair<string, TFrame>> read FStack write FStack;
     procedure Push(Frame: TFrame); overload;
     procedure Push(NavigatorTitle: string; Frame: TFrame); overload;
     procedure Pop;
+    procedure Clear;
 
   published
     property MultiView: TMultiView read FMultiView write SetMultiView;
@@ -72,6 +73,12 @@ end;
 procedure TNavigator.BackButtonClick(Sender: TObject);
 begin
   Pop;
+end;
+
+procedure TNavigator.Clear;
+begin
+  while not StackIsEmpty do
+    Pop;
 end;
 
 constructor TNavigator.Create(AOwner: TComponent);
@@ -197,7 +204,10 @@ procedure TNavigator.Pop;
 begin
   FStack.Peek.Value.Parent := nil;
 
-  FStack.Pop.Value.DisposeOf;
+  FStack
+    .Pop
+    .Value
+    .DisposeOf;
 
   if StackIsEmpty then
   begin
