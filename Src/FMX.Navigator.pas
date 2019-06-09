@@ -38,8 +38,11 @@ type
     procedure CreateButtons;
     procedure CreateToolbar;
     procedure CreateLabel;
+    procedure SetHeight(const Value: Single);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function DoSetSize(const ASize: TControlSize; const NewPlatformDefault: Boolean; ANewWidth: Single;
+      ANewHeight: Single; var ALastWidth: Single; var ALastHeight: Single): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -91,7 +94,7 @@ begin
   CreateLabel;
 
   Align := TAlignLayout.Top;
-  Height := 48;
+  Height := 56;
 
   FontColor := TAlphaColorRec.Black;
 end;
@@ -236,6 +239,16 @@ begin
   Frame.Parent := Parent;
 end;
 
+function TNavigator.DoSetSize(const ASize: TControlSize; const NewPlatformDefault: Boolean; ANewWidth,
+  ANewHeight: Single; var ALastWidth, ALastHeight: Single): Boolean;
+begin
+  inherited;
+  FToolBar.Height := ANewHeight;
+  FToolBar.Width := ANewHeight;
+  FMenuButton.Size.Width := FToolBar.Height;
+  FBackButton.Size.Width := FToolBar.Height;
+end;
+
 procedure TNavigator.Push(NavigatorTitle: string; Frame: TFrame);
 begin
   DoPush(NavigatorTitle, Frame);
@@ -255,6 +268,11 @@ begin
     FBackButton.IconTintColor := Value;
     FMenuButton.IconTintColor := Value;
   end;
+end;
+
+procedure TNavigator.SetHeight(const Value: Single);
+begin
+
 end;
 
 procedure TNavigator.SetMultiView(const Value: TMultiView);
