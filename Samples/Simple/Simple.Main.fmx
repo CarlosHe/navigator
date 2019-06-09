@@ -11,13 +11,12 @@ object SimpleMain: TSimpleMain
   object Navigator: TNavigator
     Align = Top
     Size.Width = 350.000000000000000000
-    Size.Height = 56.000000000000000000
+    Size.Height = 49.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 5
     MultiView = MultiView
-    Fill.Color = claCornflowerblue
-    Title = 'Navigator'
-    FontColor = claWhite
+    TintColor = xFF1675D1
+    Title = 'Demo navigator'
+    FontColor = claAzure
   end
   object MultiView: TMultiView
     Mode = Drawer

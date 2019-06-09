@@ -9,22 +9,19 @@ uses
 
 type
 
-  TNavigator = class(TFrame)
-    LayoutHeader: TLayout;
-    ToolBar: TToolBar;
-    LabelCaption: TLabel;
-    ShadowEffectToolbar: TShadowEffect;
-    MenuButton: TButton;
-    BackButton: TButton;
-    procedure BackButtonClick(Sender: TObject);
-    procedure MenuButtonClick(Sender: TObject);
+  TNavigator = class(TLayout)
   private
     FMultiView: TMultiView;
-    FMenuButton: TButton;
-    FBackButton: TButton;
     FMultiViewButton: TButton;
     FStack: TStack<TPair<string, TFrame>>;
     FFontColor: TAlphaColor;
+
+    FShadowEffectToolbar: TShadowEffect;
+    FToolBar: TToolBar;
+    FLabelCaption: TLabel;
+    FMenuButton: TSpeedButton;
+    FBackButton: TSpeedButton;
+
     procedure SetMultiView(const Value: TMultiView);
     function HasMultiView: Boolean;
     function StackIsEmpty: Boolean;
@@ -34,12 +31,19 @@ type
     procedure DoPush(TitleNavigator: string; Frame: TFrame);
     function GetTintColor: TAlphaColor;
     procedure SetTintColor(const Value: TAlphaColor);
+    procedure BackButtonClick(Sender: TObject);
+    procedure MenuButtonClick(Sender: TObject);
+
+    procedure CreateShadow;
+    procedure CreateButtons;
+    procedure CreateToolbar;
+    procedure CreateLabel;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property Stack: TStack<TPair<string, TFrame>> read FStack write FStack;
+    property Stack: TStack < TPair < string, TFrame >> read FStack write FStack;
     procedure Push(Frame: TFrame); overload;
     procedure Push(NavigatorTitle: string; Frame: TFrame); overload;
     procedure Pop;
@@ -55,7 +59,8 @@ procedure Register;
 
 implementation
 
-{$R *.fmx}
+uses
+  FMX.Styles.Objects;
 
 procedure Register;
 begin
@@ -72,21 +77,76 @@ end;
 constructor TNavigator.Create(AOwner: TComponent);
 begin
   inherited;
-
-  FStack := TStack<TPair<string, TFrame>>.Create;
-  LayoutHeader.SetSubComponent(True);
-  ToolBar.SetSubComponent(True);
-  ShadowEffectToolbar.SetSubComponent(True);
-  LabelCaption.SetSubComponent(True);
-  BackButton.SetSubComponent(True);
-  MenuButton.SetSubComponent(True);
+  FStack := TStack < TPair < string, TFrame >>.Create;
+  CreateShadow;
+  CreateToolbar;
+  CreateButtons;
+  CreateLabel;
 
   Align := TAlignLayout.Top;
-  Height := 56;
+  Height := 48;
 
   FontColor := TAlphaColorRec.Black;
+end;
+
+procedure TNavigator.CreateButtons;
+begin
+  FMenuButton := TSpeedButton.Create(Self);
+  FMenuButton.Parent := FToolBar;
+  FMenuButton.Align := TAlignLayout.Left;
+  FMenuButton.Size.Width := FToolBar.Height;
+  FMenuButton.StyleLookup := 'drawertoolbutton';
+  FMenuButton.OnClick := MenuButtonClick;
+  FMenuButton.Stored := False;
+  FMenuButton.SetSubComponent(True);
+
+  FBackButton := TSpeedButton.Create(Self);
+  FBackButton.Parent := FToolBar;
+  FBackButton.Align := TAlignLayout.Left;
+  FBackButton.Size.Width := FToolBar.Height;
+  FBackButton.StyleLookup := 'backtoolbutton';
+  FBackButton.Visible := False;
+  FBackButton.OnClick := BackButtonClick;
+  FBackButton.Stored := False;
+  FBackButton.SetSubComponent(True);
 
   FMultiViewButton := TButton.Create(Self);
+  FMultiViewButton.Stored := False;
+  FMultiViewButton.SetSubComponent(True);
+end;
+
+procedure TNavigator.CreateLabel;
+begin
+  FLabelCaption := TLabel.Create(Self);
+  FLabelCaption.Parent := FToolBar;
+  FLabelCaption.Align := TAlignLayout.Client;
+  FLabelCaption.Margins.Left := 16;
+  FLabelCaption.Margins.Top := 5;
+  FLabelCaption.Margins.Right := 5;
+  FLabelCaption.Margins.Bottom := 5;
+end;
+
+procedure TNavigator.CreateShadow;
+begin
+  FShadowEffectToolbar := TShadowEffect.Create(Self);
+  FShadowEffectToolbar.Distance := 3;
+  FShadowEffectToolbar.Direction := 90;
+  FShadowEffectToolbar.Softness := 0.3;
+  FShadowEffectToolbar.Opacity := 1;
+  FShadowEffectToolbar.ShadowColor := TAlphaColorRec.Darkgray;
+  FShadowEffectToolbar.Stored := False;
+  FShadowEffectToolbar.Parent := Self;
+  FShadowEffectToolbar.SetSubComponent(True);
+end;
+
+procedure TNavigator.CreateToolbar;
+begin
+  FToolBar := TToolBar.Create(Self);
+  FToolBar.Align := TAlignLayout.Contents;
+  FToolBar.StyleLookup := 'ToolBarStyle';
+  FToolBar.Parent := Self;
+  FToolBar.SetSubComponent(True);
+  FToolBar.Stored := False;
 end;
 
 destructor TNavigator.Destroy;
@@ -101,12 +161,12 @@ end;
 
 function TNavigator.GetTintColor: TAlphaColor;
 begin
-  Result := ToolBar.TintColor;
+  Result := FToolBar.TintColor;
 end;
 
 function TNavigator.GetTitle: string;
 begin
-  Result := LabelCaption.Text;
+  Result := FLabelCaption.Text;
 end;
 
 function TNavigator.HasMultiView: Boolean;
@@ -137,10 +197,7 @@ procedure TNavigator.Pop;
 begin
   FStack.Peek.Value.Parent := nil;
 
-  FStack
-    .Pop
-    .Value
-    .DisposeOf;
+  FStack.Pop.Value.DisposeOf;
 
   if StackIsEmpty then
   begin
@@ -184,7 +241,7 @@ begin
   if FFontColor <> Value then
   begin
     FFontColor := Value;
-    LabelCaption.TextSettings.FontColor := Value;
+    FLabelCaption.TextSettings.FontColor := Value;
     FBackButton.IconTintColor := Value;
     FMenuButton.IconTintColor := Value;
   end;
@@ -192,7 +249,7 @@ end;
 
 procedure TNavigator.SetMultiView(const Value: TMultiView);
 begin
-if FMultiView <> Value then
+  if FMultiView <> Value then
   begin
     FMultiView := Value;
 
@@ -200,19 +257,20 @@ if FMultiView <> Value then
     begin
       FMultiView.AddFreeNotify(Self);
       FMultiView.MasterButton := FMultiViewButton;
+      FMenuButton.Visible := True;
     end;
   end;
 end;
 
 procedure TNavigator.SetTintColor(const Value: TAlphaColor);
 begin
-  ToolBar.TintColor := Value;
+  FToolBar.TintColor := Value;
 end;
 
 procedure TNavigator.SetTitle(const Value: string);
 begin
-  if LabelCaption.Text <> Value then
-    LabelCaption.Text := Value;
+  if FLabelCaption.Text <> Value then
+    FLabelCaption.Text := Value;
 end;
 
 end.
