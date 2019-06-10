@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Generics.Collections, FMX.Types, FMX.Controls, FMX.Layouts, FMX.StdCtrls,
   FMX.Objects, FMX.Graphics, FMX.MultiView, FMX.Effects, System.UITypes,
-  FMX.Forms, FMX.Controls.Presentation;
+  FMX.Forms, FMX.Controls.Presentation, FMX.Filter.Effects;
 
 type
 
@@ -38,6 +38,7 @@ type
     procedure CreateLabel;
     procedure SetHeight(const Value: Single);
     function GetFill: TBrush;
+    procedure SetFill(const Value: TBrush);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -51,7 +52,7 @@ type
 
   published
     property MultiView: TMultiView read FMultiView write SetMultiView;
-    property Fill: TBrush read GetFill;
+    property Fill: TBrush read GetFill write SetFill;
     property Title: string read GetTitle write SetTitle;
     property FontColor: TAlphaColor read FFontColor write SetFontColor default TAlphaColorRec.Black;
   end;
@@ -131,6 +132,7 @@ begin
   FTitle.Margins.Top := 5;
   FTitle.Margins.Right := 5;
   FTitle.Margins.Bottom := 5;
+
 end;
 
 procedure TNavigator.CreateShadow;
@@ -246,14 +248,22 @@ begin
   DoPush(Title, Frame);
 end;
 
+procedure TNavigator.SetFill(const Value: TBrush);
+begin
+  FRectangle.Fill := Value;
+end;
+
 procedure TNavigator.SetFontColor(const Value: TAlphaColor);
 begin
   if FFontColor <> Value then
   begin
     FFontColor := Value;
     FTitle.TextSettings.FontColor := Value;
-    FBackButton.IconTintColor := Value;
-    FMenuButton.IconTintColor := Value;
+    if Assigned(FBackButton.IconTintObject) then
+      FBackButton.IconTintObject.TintColor := Value;
+
+    if Assigned(FMenuButton.IconTintObject) then
+      FMenuButton.IconTintObject.TintColor := Value;
   end;
 end;
 

@@ -14,9 +14,9 @@ object SimpleMain: TSimpleMain
     Size.Height = 49.000000000000000000
     Size.PlatformDefault = False
     MultiView = MultiView
-    TintColor = xFF1675D1
+    Fill.Color = xFF1675D1
     Title = 'Demo navigator'
-    FontColor = claAzure
+    FontColor = claWhite
   end
   object MultiView: TMultiView
     Mode = Drawer
