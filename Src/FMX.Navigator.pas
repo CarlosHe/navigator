@@ -19,8 +19,11 @@ type
     FShadowEffectToolbar: TShadowEffect;
     FRectangle: TRectangle;
     FTitle: TLabel;
+    FTitleFill: TFillRGBEffect;
     FMenuButton: TSpeedButton;
+    FMenuButtonFill: TFillRGBEffect;
     FBackButton: TSpeedButton;
+    FBackButtonFill: TFillRGBEffect;
 
     procedure SetMultiView(const Value: TMultiView);
     function HasMultiView: Boolean;
@@ -107,6 +110,8 @@ begin
   FMenuButton.OnClick := MenuButtonClick;
   FMenuButton.Stored := False;
   FMenuButton.SetSubComponent(True);
+  FMenuButtonFill := TFillRGBEffect.Create(FMenuButton);
+  FMenuButtonFill.Parent := FMenuButton;
 
   FBackButton := TSpeedButton.Create(Self);
   FBackButton.Parent := FRectangle;
@@ -117,6 +122,9 @@ begin
   FBackButton.OnClick := BackButtonClick;
   FBackButton.Stored := False;
   FBackButton.SetSubComponent(True);
+  FBackButtonFill := TFillRGBEffect.Create(FBackButton);
+  FBackButtonFill.Parent  := FBackButton;
+
 
   FMultiViewButton := TButton.Create(Self);
   FMultiViewButton.Stored := False;
@@ -133,6 +141,8 @@ begin
   FTitle.Margins.Right := 5;
   FTitle.Margins.Bottom := 5;
 
+  FTitleFill := TFillRGBEffect.Create(FTitle);
+  FTitleFill.Parent := FTitle;
 end;
 
 procedure TNavigator.CreateShadow;
@@ -258,12 +268,10 @@ begin
   if FFontColor <> Value then
   begin
     FFontColor := Value;
-    FTitle.TextSettings.FontColor := Value;
-    if Assigned(FBackButton.IconTintObject) then
-      FBackButton.IconTintObject.TintColor := Value;
+    FTitleFill.Color := Value;
+    FBackButtonFill.Color := Value;
 
-    if Assigned(FMenuButton.IconTintObject) then
-      FMenuButton.IconTintObject.TintColor := Value;
+    FMenuButtonFill.Color := Value;
   end;
 end;
 
