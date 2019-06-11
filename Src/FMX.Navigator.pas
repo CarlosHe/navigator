@@ -25,13 +25,19 @@ type
     FBackButton: TSpeedButton;
     FBackButtonFill: TFillRGBEffect;
 
+    FOnKeyUpOwner: TKeyEvent;
+
     procedure SetMultiView(const Value: TMultiView);
     function HasMultiView: Boolean;
     function StackIsEmpty: Boolean;
     function GetTitle: string;
     procedure SetTitle(const Value: string);
     procedure SetFontColor(const Value: TAlphaColor);
+    function GetFill: TBrush;
+    procedure SetFill(const Value: TBrush);
+
     procedure DoPush(TitleNavigator: string; Frame: TFrame);
+
     procedure BackButtonClick(Sender: TObject);
     procedure MenuButtonClick(Sender: TObject);
 
@@ -39,11 +45,12 @@ type
     procedure CreateButtons;
     procedure CreateRectangle;
     procedure CreateLabel;
+    procedure DoInjectKeyUp;
+
     procedure SetHeight(const Value: Single);
-    function GetFill: TBrush;
-    procedure SetFill(const Value: TBrush);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure OnFormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -65,7 +72,7 @@ procedure Register;
 implementation
 
 uses
-  FMX.Styles.Objects;
+  FMX.Styles.Objects, FMX.VirtualKeyboard, FMX.Platform;
 
 procedure Register;
 begin
@@ -93,6 +100,8 @@ begin
   CreateRectangle;
   CreateButtons;
   CreateLabel;
+
+  DoInjectKeyUp;
 
   Align := TAlignLayout.Top;
   Height := 56;
@@ -212,6 +221,24 @@ begin
     FMultiView := nil;
 end;
 
+procedure TNavigator.OnFormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
+var
+  LService: IFMXVirtualKeyboardService;
+begin
+  if (Key = vkHardwareBack) and not StackIsEmpty then
+  begin
+    TPlatformServices.Current.SupportsPlatformService(IFMXVirtualKeyboardService, IInterface(LService));
+    if Not((LService <> nil) and (TVirtualKeyboardState.Visible in LService.VirtualKeyBoardState))  then
+      Pop
+    else if (TVirtualKeyboardState.Visible in LService.VirtualKeyBoardState) then
+      LService.HideVirtualKeyboard;
+    Key := 0;
+  end;
+
+  if Assigned(FOnKeyUpOwner) then
+    FOnKeyUpOwner(Sender, Key, KeyChar, Shift);
+end;
+
 procedure TNavigator.Pop;
 begin
   FStack.Peek.Value.Parent := nil;
@@ -230,6 +257,20 @@ begin
   begin
     FStack.Peek.Value.Parent := Parent;
     Title := FStack.Peek.Key;
+  end;
+end;
+
+procedure TNavigator.DoInjectKeyUp;
+begin
+  if Owner.InheritsFrom(TCommonCustomForm) then
+  begin
+    FOnKeyUpOwner := TCommonCustomForm(Owner).OnKeyUp;
+    TCommonCustomForm(Owner).OnKeyUp := OnFormKeyUp;
+  end
+  else if Owner.InheritsFrom(TControl) then
+  begin
+    FOnKeyUpOwner := TControl(Owner).OnKeyUp;
+    TControl(Owner).OnKeyUp := OnFormKeyUp;
   end;
 end;
 
