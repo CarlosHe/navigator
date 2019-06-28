@@ -1,4 +1,4 @@
-unit Simple.Main;
+unit Simple.Navigator;
 
 interface
 
@@ -10,17 +10,19 @@ uses
   FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 
 type
-  TSimpleMain = class(TForm)
+  TSimpleNavigator = class(TForm)
     MultiView: TMultiView;
     Button1: TButton;
     Navigator: TNavigator;
     procedure Button1Click(Sender: TObject);
+    procedure NavigatorGetMainForm(out AFrame: TFrame);
+
   public
-    { Public declarations }
+
   end;
 
 var
-  SimpleMain: TSimpleMain;
+  SimpleNavigator: TSimpleNavigator;
 
 implementation
 
@@ -28,10 +30,14 @@ implementation
 
 uses Simple.Master;
 
-procedure TSimpleMain.Button1Click(Sender: TObject);
+procedure TSimpleNavigator.Button1Click(Sender: TObject);
 begin
-  Navigator.Push(TSimpleMaster.Create(Navigator));
-  MultiView.HideMaster;
+  Close;
+end;
+
+procedure TSimpleNavigator.NavigatorGetMainForm(out AFrame: TFrame);
+begin
+  AFrame := TSimpleMaster.Create(Navigator);
 end;
 
 end.

@@ -1,4 +1,4 @@
-object SimpleMain: TSimpleMain
+object SimpleNavigator: TSimpleNavigator
   Left = 0
   Top = 0
   Caption = 'Form10'
@@ -13,6 +13,7 @@ object SimpleMain: TSimpleMain
     Size.Width = 350.000000000000000000
     Size.Height = 49.000000000000000000
     Size.PlatformDefault = False
+    OnGetMainForm = NavigatorGetMainForm
     MultiView = MultiView
     Fill.Color = xFF1675D1
     Title = 'Demo navigator'
@@ -21,7 +22,7 @@ object SimpleMain: TSimpleMain
   object MultiView: TMultiView
     Mode = Drawer
     Size.Width = 250.000000000000000000
-    Size.Height = 424.000000000000000000
+    Size.Height = 431.000000000000000000
     Size.PlatformDefault = False
     Visible = False
     TabOrder = 2
@@ -31,7 +32,7 @@ object SimpleMain: TSimpleMain
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Text = 'Master'
+      Text = 'Logout'
       OnClick = Button1Click
     end
   end

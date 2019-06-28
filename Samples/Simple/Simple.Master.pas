@@ -16,7 +16,7 @@ type
     FNavigator: TNavigator;
     property Navigator: TNavigator read FNavigator write FNavigator;
   public
-    constructor Create(Navigator: TNavigator); reintroduce;
+    constructor Create(ANavigator: TNavigator); reintroduce;
   end;
 
 implementation
@@ -32,11 +32,10 @@ begin
   Navigator.Push('New Title', TSimpleDetail.Create(nil));
 end;
 
-constructor TSimpleMaster.Create(Navigator: TNavigator);
+constructor TSimpleMaster.Create(ANavigator: TNavigator);
 begin
   inherited Create(nil);
-
-  FNavigator := Navigator;
+  Navigator := ANavigator;
 end;
 
 end.

@@ -8,6 +8,7 @@ uses
   FMX.Forms, FMX.Controls.Presentation, FMX.Filter.Effects;
 
 type
+  TGetMainFrameEvent = procedure(out AFrame: TFrame) of object;
 
   TNavigator = class(TLayout)
   private
@@ -15,6 +16,8 @@ type
     FMultiViewButton: TButton;
     FStack: TStack<TPair<string, TFrame>>;
     FFontColor: TAlphaColor;
+    FMainFrame: TFrame;
+    FOnGetMainForm: TGetMainFrameEvent;
 
     FShadowEffectToolbar: TShadowEffect;
     FRectangle: TRectangle;
@@ -46,11 +49,14 @@ type
     procedure CreateRectangle;
     procedure CreateLabel;
     procedure DoInjectKeyUp;
-
-    procedure SetHeight(const Value: Single);
+    procedure SetMainFrame(const Value: TFrame);
+  private
+    property MainFrame: TFrame read FMainFrame write SetMainFrame;
+    procedure DoOnGetMainForm;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure OnFormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
+    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -59,8 +65,8 @@ type
     procedure Push(NavigatorTitle: string; Frame: TFrame); overload;
     procedure Pop;
     procedure Clear;
-
   published
+    property OnGetMainForm: TGetMainFrameEvent read FOnGetMainForm write FOnGetMainForm;
     property MultiView: TMultiView read FMultiView write SetMultiView;
     property Fill: TBrush read GetFill write SetFill;
     property Title: string read GetTitle write SetTitle;
@@ -95,6 +101,7 @@ end;
 constructor TNavigator.Create(AOwner: TComponent);
 begin
   inherited;
+
   FStack := TStack<TPair<string, TFrame>>.Create;
   CreateShadow;
   CreateRectangle;
@@ -202,6 +209,12 @@ begin
   Result := FMultiView <> nil;
 end;
 
+procedure TNavigator.Loaded;
+begin
+  inherited;
+  DoOnGetMainForm;
+end;
+
 procedure TNavigator.MenuButtonClick(Sender: TObject);
 begin
   if Assigned(FMultiView) then
@@ -252,6 +265,9 @@ begin
   begin
     FMenuButton.Visible := True;
     FBackButton.Visible := False;
+
+    if Assigned(FMainFrame) then
+      FMainFrame.Parent := Parent;
   end
   else
   begin
@@ -274,15 +290,30 @@ begin
   end;
 end;
 
+procedure TNavigator.DoOnGetMainForm;
+var
+  LMainFrame: TFrame;
+begin
+  if not(csDesigning in ComponentState) and Assigned(FOnGetMainForm) then
+  begin
+    FOnGetMainForm(LMainFrame);
+    MainFrame := LMainFrame;
+  end;
+end;
+
 procedure TNavigator.DoPush(TitleNavigator: string; Frame: TFrame);
 begin
   if StackIsEmpty then
   begin
     FMenuButton.Visible := False;
     FBackButton.Visible := True;
+
+    if Assigned(FMainFrame) then
+      FMainFrame.Parent := nil;
   end
   else
     FStack.Peek.Value.Parent := nil;
+
   FStack.Push(TPair<string, TFrame>.Create(TitleNavigator, Frame));
   Title := TitleNavigator;
   Frame.Align := TAlignLayout.Client;
@@ -316,9 +347,25 @@ begin
   end;
 end;
 
-procedure TNavigator.SetHeight(const Value: Single);
+procedure TNavigator.SetMainFrame(const Value: TFrame);
 begin
+  if FMainFrame <> Value then
+  begin
+    if Assigned(FMainFrame) then
+    begin
+      RemoveFreeNotification(FMainFrame);
+      FMainFrame.DisposeOf;
+    end;
 
+    FMainFrame := Value;
+
+    if FMainFrame <> nil then
+    begin
+      AddFreeNotify(FMainFrame);
+      FMainFrame.Align := TAlignLayout.Client;
+      FMainFrame.Parent := Parent;
+    end;
+  end;
 end;
 
 procedure TNavigator.SetMultiView(const Value: TMultiView);
