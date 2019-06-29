@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls,
   FMX.Layouts, FMX.Objects, FMX.Navigator, FMX.MultiView, FMX.Effects, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
-  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FMX.Ani;
 
 type
   TSimpleNavigator = class(TForm)
@@ -15,7 +15,8 @@ type
     Button1: TButton;
     Navigator: TNavigator;
     procedure Button1Click(Sender: TObject);
-    procedure NavigatorGetMainForm(out AFrame: TFrame);
+    procedure NavigatorGetMainFrame(out AFrame: TFrame);
+    procedure NavigatorSettingsClick(Sender: TObject);
 
   public
 
@@ -35,9 +36,14 @@ begin
   Close;
 end;
 
-procedure TSimpleNavigator.NavigatorGetMainForm(out AFrame: TFrame);
+procedure TSimpleNavigator.NavigatorGetMainFrame(out AFrame: TFrame);
 begin
   AFrame := TSimpleMaster.Create(Navigator);
+end;
+
+procedure TSimpleNavigator.NavigatorSettingsClick(Sender: TObject);
+begin
+  ShowMessage('Test');
 end;
 
 end.

@@ -17,16 +17,18 @@ type
     FStack: TStack<TPair<string, TFrame>>;
     FFontColor: TAlphaColor;
     FMainFrame: TFrame;
-    FOnGetMainForm: TGetMainFrameEvent;
+    FOnGetMainFrame: TGetMainFrameEvent;
 
     FShadowEffectToolbar: TShadowEffect;
     FRectangle: TRectangle;
     FTitle: TLabel;
     FTitleFill: TFillRGBEffect;
-    FMenuButton: TSpeedButton;
+    FMenuButton: TButton;
     FMenuButtonFill: TFillRGBEffect;
-    FBackButton: TSpeedButton;
+    FBackButton: TButton;
     FBackButtonFill: TFillRGBEffect;
+    FSettingsButton: TButton;
+    FSettingsButtonFill: TFillRGBEffect;
 
     FOnKeyUpOwner: TKeyEvent;
 
@@ -51,8 +53,11 @@ type
     procedure DoInjectKeyUp;
     procedure SetMainFrame(const Value: TFrame);
   private
+    FOnSettingsClick: TNotifyEvent;
+    function GetVisibleSettings: Boolean;
+    procedure SetVisibleSettings(const Value: Boolean);
     property MainFrame: TFrame read FMainFrame write SetMainFrame;
-    procedure DoOnGetMainForm;
+    procedure DoOnGetMainFrame;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure OnFormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
@@ -66,7 +71,9 @@ type
     procedure Pop;
     procedure Clear;
   published
-    property OnGetMainForm: TGetMainFrameEvent read FOnGetMainForm write FOnGetMainForm;
+    property OnSettingsClick: TNotifyEvent read FOnSettingsClick write FOnSettingsClick;
+    property OnGetMainFrame: TGetMainFrameEvent read FOnGetMainFrame write FOnGetMainFrame;
+    property VisibleSettings: Boolean read GetVisibleSettings write SetVisibleSettings default False;
     property MultiView: TMultiView read FMultiView write SetMultiView;
     property Fill: TBrush read GetFill write SetFill;
     property Title: string read GetTitle write SetTitle;
@@ -118,7 +125,7 @@ end;
 
 procedure TNavigator.CreateButtons;
 begin
-  FMenuButton := TSpeedButton.Create(Self);
+  FMenuButton := TButton.Create(Self);
   FMenuButton.Parent := FRectangle;
   FMenuButton.Align := TAlignLayout.Left;
   FMenuButton.Size.Width := FRectangle.Height;
@@ -129,7 +136,7 @@ begin
   FMenuButtonFill := TFillRGBEffect.Create(FMenuButton);
   FMenuButtonFill.Parent := FMenuButton;
 
-  FBackButton := TSpeedButton.Create(Self);
+  FBackButton := TButton.Create(Self);
   FBackButton.Parent := FRectangle;
   FBackButton.Align := TAlignLayout.Left;
   FBackButton.Size.Width := FRectangle.Height;
@@ -145,6 +152,17 @@ begin
   FMultiViewButton := TButton.Create(Self);
   FMultiViewButton.Stored := False;
   FMultiViewButton.SetSubComponent(True);
+
+  FSettingsButton := TButton.Create(Self);
+  FSettingsButton.Parent := FRectangle;
+  FSettingsButton.Align := TAlignLayout.Right;
+  FSettingsButton.Size.Width := FRectangle.Height;
+  FSettingsButton.StyleLookup := 'detailstoolbutton';
+  VisibleSettings := False;
+  FSettingsButton.Stored := False;
+  FSettingsButton.SetSubComponent(True);
+  FSettingsButtonFill := TFillRGBEffect.Create(FSettingsButton);
+  FSettingsButtonFill.Parent  := FSettingsButton;
 end;
 
 procedure TNavigator.CreateLabel;
@@ -204,6 +222,11 @@ begin
   Result := FTitle.Text;
 end;
 
+function TNavigator.GetVisibleSettings: Boolean;
+begin
+  Result := FSettingsButton.Visible;
+end;
+
 function TNavigator.HasMultiView: Boolean;
 begin
   Result := FMultiView <> nil;
@@ -212,7 +235,8 @@ end;
 procedure TNavigator.Loaded;
 begin
   inherited;
-  DoOnGetMainForm;
+  DoOnGetMainFrame;
+  FSettingsButton.OnClick := FOnSettingsClick;
 end;
 
 procedure TNavigator.MenuButtonClick(Sender: TObject);
@@ -290,13 +314,13 @@ begin
   end;
 end;
 
-procedure TNavigator.DoOnGetMainForm;
+procedure TNavigator.DoOnGetMainFrame;
 var
   LMainFrame: TFrame;
 begin
-  if not(csDesigning in ComponentState) and Assigned(FOnGetMainForm) then
+  if not(csDesigning in ComponentState) and Assigned(FOnGetMainFrame) then
   begin
-    FOnGetMainForm(LMainFrame);
+    FOnGetMainFrame(LMainFrame);
     MainFrame := LMainFrame;
   end;
 end;
@@ -342,7 +366,7 @@ begin
     FFontColor := Value;
     FTitleFill.Color := Value;
     FBackButtonFill.Color := Value;
-
+    FSettingsButtonFill.Color := Value;
     FMenuButtonFill.Color := Value;
   end;
 end;
@@ -387,6 +411,14 @@ procedure TNavigator.SetTitle(const Value: string);
 begin
   if FTitle.Text <> Value then
     FTitle.Text := Value;
+end;
+
+procedure TNavigator.SetVisibleSettings(const Value: Boolean);
+begin
+  if FSettingsButton.Visible <> Value then
+  begin
+    FSettingsButton.Visible := Value    
+  end;
 end;
 
 end.
